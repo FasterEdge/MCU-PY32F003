@@ -1,0 +1,30 @@
+# ============================================
+# Cortex-M0+ 嵌入式项目（Keil MDK / PlatformIO）
+# ============================================
+
+# Keil MDK
+\Objects/
+\Listings/
+*.uvguix.*
+*.bak
+*.uvopt
+
+# PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# 编译产物
+*.o
+*.obj
+*.hex
+*.bin
+*.lst
+*.map
+*.axf
+*.elf
+*.d
+
+# 系统
+.DS_Store
+Thumbs.db
