@@ -100,30 +100,55 @@ void fe_port_uart_close(u8 port) {
 
 // ============================================================
 // EEPROM（PY32F003 无硬件 EEPROM；用用户区 DataFlash 模拟 1KB）
+// 用户区 DataFlash 基址按数据手册填写（16KB Flash 型号常见 0x08003C00），
+// 共 1KB，按字节内存映射可读。
 // ============================================================
-// 参考（ch32v00x 固件库 FLASH_Program / FLASH_Erase 封装）：
-//   fe_arduino 桥接在 arduino 版已用 EEPROM 库；此处保留接口。
+#ifndef FE_DATAFLASH_BASE
+#define FE_DATAFLASH_BASE 0x08003C00u
+#endif
+
+// 读：用户区按字节内存映射，直接解引用
+static u8 dataflash_read(u16 addr) {
+    return ((volatile u8 *)FE_DATAFLASH_BASE)[addr];
+}
+
 u8 fe_port_eeprom_get_str(u16 addr, char *out, u16 outlen) {
-    // TODO: DataFlash 读取（FLASH_ReadDataFlashByte(0x08003C00 + addr) 等）
-    (void)addr; (void)out; (void)outlen;
-    if (outlen) out[0] = 0;
-    return FALSE;
+    u16 i;
+    if (!out || outlen == 0) return FALSE;
+    for (i = 0; i + 1 < outlen; i++) {
+        u8 c = dataflash_read((u16)(addr + i));
+        out[i] = (char)c;
+        if (c == 0) return TRUE;
+    }
+    out[outlen - 1] = 0;
+    return TRUE;
 }
-u8 fe_port_eeprom_set_str(u16 addr, const char *value) {
-    // TODO: DataFlash 写入（解锁 + 擦扇区 + FLASH_ProgramDataFlashByte）
-    (void)addr; (void)value;
-    return FALSE;
-}
+
 u8 fe_port_eeprom_get_u32(u16 addr, u32 *out) {
     u8 i;
-    (void)addr;
-    if (out) { *out = 0; }
-    for (i = 0; i < 4; i++) (void)i;
-    return FALSE;
+    u32 v = 0;
+    if (!out) return FALSE;
+    for (i = 0; i < 4; i++)
+        v |= (u32)dataflash_read((u16)(addr + i)) << (8 * i);
+    *out = v;
+    return TRUE;
 }
+
+// 写：DataFlash 需经厂商 FLASH 控制器解锁 + 扇区擦除 + 编程。
+// 本仓库为寄存器级参考实现，未内嵌厂商固件库；接入厂商库时在此实现：
+//   REQUIRED_PORT_HOOK(dataflash_write)：
+//     FLASH_Unlock();
+//     FLASH_Erase...(FE_DATAFLASH_BASE + addr);
+//     FLASH_Program...(FE_DATAFLASH_BASE + addr, val);
+//     FLASH_Lock();
+u8 fe_port_eeprom_set_str(u16 addr, const char *value) {
+    (void)addr; (void)value;
+    return FALSE;   // REQUIRED_PORT_HOOK：接入厂商 DataFlash 写序列后返回 TRUE
+}
+
 u8 fe_port_eeprom_set_u32(u16 addr, u32 value) {
     (void)addr; (void)value;
-    return FALSE;
+    return FALSE;   // REQUIRED_PORT_HOOK：同 set_str，写 4 字节（小端）
 }
 
 // ============================================================
