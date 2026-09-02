@@ -1,3 +1,4 @@
+// FasterEdge 开源项目 - Github: https://github.com/FasterEdge - Gitee: https://gitee.com/FasterEdge
 // register.c — 注册全部 Data / Ability 到全局 Atom（PY32F003 (Cortex-M0+) 版）
 // 注意：为兼容多编译器，模块全部用显式静态变量。
 #include "fe.h"

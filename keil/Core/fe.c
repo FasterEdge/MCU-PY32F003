@@ -1,3 +1,4 @@
+// FasterEdge 开源项目 - Github: https://github.com/FasterEdge - Gitee: https://gitee.com/FasterEdge
 // fe.c — FasterEdge MCU 核心框架实现（PY32F003 (Cortex-M0+) 版）
 // 注意：输出格式化统一使用 fe_snprintf（在 fe_port.h 声明、fe_port.c 提供），
 // 因为嵌入式标准库对 %ld/%lu 支持有限，且对 %ld/%lu 支持有限。

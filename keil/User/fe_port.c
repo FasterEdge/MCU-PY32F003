@@ -1,3 +1,4 @@
+// FasterEdge 开源项目 - Github: https://github.com/FasterEdge - Gitee: https://gitee.com/FasterEdge
 
 // PY32F003 为 32 位 Cortex-M0+ 内核：24MHz、16KB Flash、2KB RAM、无硬件 EEPROM。
 // 本文件为寄存器级参考实现：
