@@ -1,0 +1,27 @@
+# FasterEdge 开源项目 - Github: https://github.com/FasterEdge - Gitee: https://gitee.com/FasterEdge
+# C 代码 CI: gcc 语法检查(platformio_ide 工程源码, 不依赖 MCU 工具链)。
+# 说明: 该平台无 PlatformIO registry 官方平台(py32/cw32), 固件以 Keil/本地工具链为准,
+# CI 做源码级语法验证(标准 C 框架层)。
+name: 'C 代码检查(gcc)'
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gcc-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 'gcc 语法检查 platformio_ide/src'
+        working-directory: platformio_ide
+        run: |
+          set -e
+          for f in $(find src -name '*.c' | sort); do
+            gcc -fsyntax-only -Wall -Wextra -I src -I include "$f"
+            echo "  OK: $f"
+          done
