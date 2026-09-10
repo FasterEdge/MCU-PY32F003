@@ -208,7 +208,10 @@ int fe_port_gpio_set_mode(u8 pin, const char *mode) {
     else if (strcmp(mode, "input") == 0) { /* 默认浮空 */ }
     else return -1;
     // 使能端口时钟（简化：直接置位）
-    RCC_APB2PCENR |= (1u << 2);                // IOPAEN（GPIOB/C 同理）
+    // 引脚映射覆盖 GPIOA(pin 0-7)/GPIOB(pin 8-15)/GPIOC(pin 16-19)，
+    // 须同时开 IOPAEN|IOPBEN|IOPCEN(bit 2/3/4)——仅开 IOPAEN 时 PB/PC 时钟未使能,
+    // set_mode 对 pin 8-19 的寄存器配置无效(修复: 一次置位三端口时钟)。
+    RCC_APB2PCENR |= (1u << 2) | (1u << 3) | (1u << 4); // IOPAEN | IOPBEN | IOPCEN
     cfg = (u32 *)(base + (bit < 8 ? 0x00u : 0x04u));
     outdr = *(u32 *)(base + 0x0Cu);
     if (is_output) {
