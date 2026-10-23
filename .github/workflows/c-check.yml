@@ -16,7 +16,7 @@ jobs:
   gcc-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: 'gcc 语法检查 platformio_ide/src'
         working-directory: platformio_ide
         run: |
